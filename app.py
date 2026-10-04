@@ -8,7 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-change-me")
-DB = os.path.join(os.path.dirname(__file__), "careershield.db")
+DB = "/tmp/careershield.db" if os.environ.get("VERCEL") else os.path.join(os.path.dirname(__file__), "careershield.db")
 EDU = re.compile(r"@([\w.-]+\.(edu|ac\.[a-z]{2}|edu\.[a-z]{2}))$", re.I)  # college email check
 
 SCHEMA = """
@@ -236,7 +236,7 @@ T["skillgap.html"] = """{% extends 'base.html' %}{% block body %}<h1>Skill gap</
 {% if result %}<div class=card><p>You have: {{result.have|join(', ') or 'none yet'}}</p><p>Missing: {{result.missing|join(', ') or 'nothing'}}</p>
 <b>Classmates who can help</b>{% for h in result.helpers %}<p>{{h.name}} <span class=mute>({{h.skills}})</span></p>{% else %}<p class=mute>No one yet.</p>{% endfor %}</div>{% endif %}{% endblock %}"""
 app.jinja_loader = DictLoader(T)
-
+init db()
 if __name__ == "__main__":
     init_db()
     if len(sys.argv) == 3 and sys.argv[1] == "verify":   # python app.py verify alum@college.edu
